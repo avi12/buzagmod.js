@@ -19,7 +19,7 @@ export interface ModMetadata {
 declare global {
   interface Window {
     api: {
-      loadMods(): Promise<Mods>;
+      loadMods(): Promise<{ modsEnabled: Mods; modsDisabled: Mods }>;
       addMod({
         fileEntries,
         uuid,
@@ -30,6 +30,8 @@ declare global {
         metadata: Omit<ModMetadata, "icon" | "md5" | "files">;
       }): boolean | string;
       deleteMod(uuid: string): boolean | string;
+      enableMod(uuid: string): boolean;
+      disableMod(uuid: string): boolean;
     };
   }
 }

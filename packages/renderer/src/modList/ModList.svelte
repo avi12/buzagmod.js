@@ -2,7 +2,7 @@
   import { AppBar, Button, Dialog, Icon, Tooltip } from "svelte-materialify";
   import { fade } from "svelte/transition";
   import { mdiDelete, mdiPlus } from "@mdi/js";
-  import { errorMessage, filesInUse, modCollisions, mods } from "../../../shared";
+  import { errorMessage, filesInUse, modCollisions, modsOff, modsOn } from "../../../shared";
   import { delay, duration } from "../core/transition-utils";
   import Mod from "./Mod.svelte";
   import Dropzone from "../dropzone/Dropzone.svelte";
@@ -14,7 +14,7 @@
 
   function onAddedMod(e): void {
     const modNew = e.detail;
-    $mods = { ...$mods, ...modNew };
+    $modsOn = { ...$modsOn, ...modNew };
     const [uuid] = Object.keys(modNew);
     for (const file of modNew[uuid].metadata.files) {
       $filesInUse[file] = uuid;
@@ -35,7 +35,8 @@
       window.api.deleteMod(modId);
     }
 
-    $mods = {};
+    $modsOn = {};
+    $modsOff = {};
     $modCollisions = [];
     $errorMessage = "";
     $filesInUse = {};
@@ -61,8 +62,16 @@
     </div>
   </AppBar>
 
-  {#each Object.entries($mods) as [uuid, mod]}
-    <Mod {uuid} {mod} />
+  {#each Object.entries($modsOn) as [uuid, mod], i(uuid)}
+    <div animate:flip>
+      <Mod {uuid} {mod} />
+    </div>
+  {/each}
+
+  {#each Object.entries($modsOff) as [uuid, mod], i(uuid)}
+    <div animate:flip>
+      <Mod {uuid} {mod} />
+    </div>
   {/each}
 </article>
 

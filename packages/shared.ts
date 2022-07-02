@@ -2,7 +2,8 @@ import { get, writable } from "svelte/store";
 import { blobToDataUrl } from "@maruware/blob-to-base64";
 import type { Mods } from "../types/global.interfaces";
 
-export const mods = writable<Mods>({});
+export const modsOn = writable<Mods>({});
+export const modsOff = writable<Mods>({});
 export const errorMessage = writable("");
 export const modCollisions = writable<string[]>([]);
 export const filesInUse = writable<{ [filename: string]: string }>({});
@@ -19,7 +20,7 @@ export function getIconPath(uuid: string): string {
 
 export function getModFilesToUuids(): { [filename: string]: string } {
   const files: { [filename: string]: string } = {};
-  const loadedMods = get(mods);
+  const loadedMods = get(modsOn);
   for (const uuid in loadedMods) {
     for (const filename of loadedMods[uuid].metadata.files) {
       files[filename] = uuid;
@@ -40,7 +41,11 @@ export async function deleteMod(uuid: string): Promise<void> {
     }
     return files;
   });
-  mods.update(mods => {
+  modsOn.update(mods => {
+    delete mods[uuid];
+    return mods;
+  });
+  modsOff.update(mods => {
     delete mods[uuid];
     return mods;
   });
