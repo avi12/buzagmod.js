@@ -1,6 +1,5 @@
 {
-  "name": "vite-electron-builder-svelte",
-  "private": true,
+  "name": "buzagmod.js",
   "engines": {
     "node": ">=v16.13",
     "npm": ">=8.1"
