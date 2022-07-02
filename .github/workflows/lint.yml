@@ -1,0 +1,39 @@
+name: Linters
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.svelte'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/lint.yml'
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.svelte'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/lint.yml'
+
+
+defaults:
+  run:
+    shell: 'bash'
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16 # Need for pnpm >=7.4
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      - run: pnpm run lint
