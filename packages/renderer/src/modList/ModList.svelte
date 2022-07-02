@@ -2,11 +2,12 @@
   import { AppBar, Button, Dialog, ExpansionPanel, ExpansionPanels, Icon, ListItem, Tooltip } from "svelte-materialify";
   import { fade } from "svelte/transition";
   import { mdiDelete, mdiPlus } from "@mdi/js";
-  import { errorMessage, filesInUse, modCollisions, mods } from "../../../shared";
+  import { deleteMod, errorMessage, filesInUse, modCollisions, mods } from "../../../shared";
   import { delay, duration } from "../core/transition-utils";
   import Mod from "./Mod.svelte";
   import ModToDelete from "./ModToDelete.svelte";
   import Dropzone from "../dropzone/Dropzone.svelte";
+  import { theme } from "../core/dark-mode";
 
   let isShowDropzone = false;
   let lastModInstalled = "";
@@ -39,6 +40,12 @@
     $errorMessage = "";
     $filesInUse = {};
   }
+
+  function deleteCollidingMods(): void {
+    for (const uuid of $modCollisions) {
+      deleteMod(uuid);
+    }
+  }
 </script>
 
 <article in:fade|local={{ delay, duration }} out:fade={{ duration }}>
@@ -52,7 +59,7 @@
         <span slot="tip">הוסף מוד</span>
       </Tooltip>
       <Tooltip active={false} bottom>
-        <Button icon on:click={deleteAllMods}>
+        <Button icon on:click={deleteAllMods} outlined={$theme === "dark"}>
           <Icon path={mdiDelete} />
         </Button>
         <span slot="tip">מחק את כל המודים</span>
@@ -67,16 +74,22 @@
 
 <ExpansionPanels disabled value={$modCollisions.length > 0 ? [0] : []}>
   <ExpansionPanel>
-    <article>
-      {#if $modCollisions.length > 0}
+    {#if $modCollisions.length > 0}
+      <article class="collisions-list-container">
         <section class="text-body">ישנה התנגשות בין המוד "{lastModInstalled}" והמודים:</section>
-        {#each $modCollisions as uuid}
-          <ListItem>
-            <ModToDelete {uuid} />
-          </ListItem>
-        {/each}
-      {/if}
-    </article>
+        <section class="collisions-list">
+          {#each $modCollisions as uuid}
+            <ListItem class="list-item-mod-to-delete">
+              <ModToDelete {uuid} />
+            </ListItem>
+          {/each}
+        </section>
+        <Button class="btn-delete-collisions" on:click={deleteCollidingMods}>
+          <Icon path={mdiDelete} />
+          מחק את כל הקונפליקטים
+        </Button>
+      </article>
+    {/if}
   </ExpansionPanel>
 </ExpansionPanels>
 
@@ -100,6 +113,10 @@
     margin-inline-end: 12px;
   }
 
+  :global(.btn-delete-collisions > .s-btn__content) {
+    letter-spacing: normal;
+  }
+
   :global(.s-dialog__content) {
     width: 50%;
     height: 70%;
@@ -111,11 +128,25 @@
   }
 
   :global(.s-expansion-panels) {
-    position: fixed !important;
+    position: sticky;
     bottom: 0;
   }
 
   :global(.s-expansion-panel) {
     color: var(--theme-text-primary) !important;
+  }
+
+  .collisions-list-container {
+    flex: 1;
+  }
+
+  .collisions-list {
+    overflow-y: scroll;
+    max-height: 100px;
+    margin-bottom: 10px;
+  }
+
+  :global(.list-item-mod-to-delete > .s-list-item__content) {
+    padding: 0;
   }
 </style>
