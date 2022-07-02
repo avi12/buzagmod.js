@@ -8,6 +8,8 @@
   import Dropzone from "../dropzone/Dropzone.svelte";
   import { theme } from "../core/dark-mode";
   import ModCollisions from "./ModCollisions.svelte";
+  import { flip } from "svelte/animate";
+  import "./ModList.svelte";
 
   let isShowDropzone = false;
   let lastModInstalled = "";
@@ -82,28 +84,8 @@
 </Dialog>
 
 <style lang="scss">
-  :global(.s-list-item [slot="prepend"] .s-avatar) {
-    margin-inline-end: 16px;
-    margin-right: 0 !important;
-  }
-
-  :global(.s-app-bar__title) {
-    padding-inline-start: 16px;
-    padding-left: 0 !important;
-  }
-
   .header-icon-container {
     flex: 0;
     margin-inline-end: 12px;
-  }
-
-  :global(.s-dialog__content) {
-    width: 50%;
-    height: 70%;
-    outline: 1px solid gray;
-  }
-
-  :global(.theme--dark .s-dialog__content) {
-    outline: 1px solid gray;
   }
 </style>

@@ -35,19 +35,6 @@
 </ExpansionPanels>
 
 <style lang="scss">
-  :global(.s-expansion-panels) {
-    position: sticky;
-    bottom: 0;
-  }
-
-  :global(.btn-delete-collisions > .s-btn__content) {
-    letter-spacing: 0.06em;
-  }
-
-  :global(.s-expansion-panel) {
-    color: var(--theme-text-primary) !important;
-  }
-
   .collisions-list-container {
     flex: 1;
   }
@@ -56,9 +43,5 @@
     overflow-y: scroll;
     max-height: 100px;
     margin-bottom: 10px;
-  }
-
-  :global(.list-item-mod-to-delete > .s-list-item__content) {
-    padding: 0;
   }
 </style>

@@ -4,6 +4,7 @@
   import { theme } from "./core/dark-mode";
   import Dropzone from "./dropzone/Dropzone.svelte";
   import ModList from "./modList/ModList.svelte";
+  import "./App.scss";
 
   function onAddedMod(e): void {
     const modNew = e.detail;
@@ -22,18 +23,3 @@
     <ModList />
   {/if}
 </MaterialApp>
-
-<style lang="scss">
-  :global(html) {
-    height: unset !important;
-  }
-
-  :global(body::-webkit-scrollbar) {
-    width: 0;
-  }
-
-  :global(.s-app) {
-    direction: rtl;
-    height: 100vh;
-  }
-</style>

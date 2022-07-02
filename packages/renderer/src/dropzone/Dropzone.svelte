@@ -17,6 +17,7 @@
   } from "../../../shared";
   import type { ModMetadata } from "../../../../types/global.interfaces";
   import { delay, duration } from "../core/transition-utils";
+  import "./Dropzone.scss";
 
   const dispatch = createEventDispatcher();
   $modCollisions = [];
@@ -240,23 +241,9 @@
     height: 100%;
   }
 
-  :global(.s-card.dropzone) {
-    position: relative;
-    $size: 90%;
-    width: $size;
-    height: $size;
-
-    // Maximize the card size to fill the dropzone area
-    padding: 0 !important;
-  }
-
   .center-text {
     display: grid;
     place-items: center;
-  }
-
-  :global(.theme--dark .s-card.outlined) {
-    border-color: white !important;
   }
 
   .dropzone-wrapper {
@@ -279,18 +266,6 @@
 
     &--error {
       background-color: hsl(342, 100%, 90%) !important;
-    }
-  }
-
-  :global(.theme--dark) {
-    .drag-over {
-      &--hover {
-        background-color: hsl(0, 0%, 30%);
-      }
-
-      &--error {
-        background-color: hsl(4, 90%, 20%) !important;
-      }
     }
   }
 </style>
