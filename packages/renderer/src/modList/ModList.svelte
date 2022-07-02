@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { AppBar, Button, Dialog, ExpansionPanel, ExpansionPanels, Icon, ListItem, Tooltip } from "svelte-materialify";
+  import { AppBar, Button, Dialog, Icon, Tooltip } from "svelte-materialify";
   import { fade } from "svelte/transition";
   import { mdiDelete, mdiPlus } from "@mdi/js";
-  import { deleteMod, errorMessage, filesInUse, modCollisions, mods } from "../../../shared";
+  import { errorMessage, filesInUse, modCollisions, mods } from "../../../shared";
   import { delay, duration } from "../core/transition-utils";
   import Mod from "./Mod.svelte";
-  import ModToDelete from "./ModToDelete.svelte";
   import Dropzone from "../dropzone/Dropzone.svelte";
   import { theme } from "../core/dark-mode";
+  import ModCollisions from "./ModCollisions.svelte";
 
   let isShowDropzone = false;
   let lastModInstalled = "";
@@ -40,12 +40,6 @@
     $errorMessage = "";
     $filesInUse = {};
   }
-
-  function deleteCollidingMods(): void {
-    for (const uuid of $modCollisions) {
-      deleteMod(uuid);
-    }
-  }
 </script>
 
 <article in:fade|local={{ delay, duration }} out:fade={{ duration }}>
@@ -72,26 +66,7 @@
   {/each}
 </article>
 
-<ExpansionPanels disabled value={$modCollisions.length > 0 ? [0] : []}>
-  <ExpansionPanel>
-    {#if $modCollisions.length > 0}
-      <article class="collisions-list-container">
-        <section class="text-body">ישנה התנגשות בין המוד "{lastModInstalled}" והמודים:</section>
-        <section class="collisions-list">
-          {#each $modCollisions as uuid}
-            <ListItem class="list-item-mod-to-delete">
-              <ModToDelete {uuid} />
-            </ListItem>
-          {/each}
-        </section>
-        <Button class="btn-delete-collisions" on:click={deleteCollidingMods}>
-          <Icon path={mdiDelete} />
-          מחק את כל הקונפליקטים
-        </Button>
-      </article>
-    {/if}
-  </ExpansionPanel>
-</ExpansionPanels>
+<ModCollisions {lastModInstalled} />
 
 <Dialog bind:active={isShowDropzone} class="pa-4">
   <Dropzone on:addedMod={onAddedMod} on:error={onError} />
@@ -113,10 +88,6 @@
     margin-inline-end: 12px;
   }
 
-  :global(.btn-delete-collisions > .s-btn__content) {
-    letter-spacing: normal;
-  }
-
   :global(.s-dialog__content) {
     width: 50%;
     height: 70%;
@@ -125,28 +96,5 @@
 
   :global(.theme--dark .s-dialog__content) {
     outline: 1px solid gray;
-  }
-
-  :global(.s-expansion-panels) {
-    position: sticky;
-    bottom: 0;
-  }
-
-  :global(.s-expansion-panel) {
-    color: var(--theme-text-primary) !important;
-  }
-
-  .collisions-list-container {
-    flex: 1;
-  }
-
-  .collisions-list {
-    overflow-y: scroll;
-    max-height: 100px;
-    margin-bottom: 10px;
-  }
-
-  :global(.list-item-mod-to-delete > .s-list-item__content) {
-    padding: 0;
   }
 </style>
