@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, Icon } from "svelte-materialify";
   import { mdiDelete } from "@mdi/js";
-  import { deleteMod, mods } from "../../../shared";
+  import { deleteMod, modsOn } from "../../../shared";
 
   export let uuid: string;
 </script>
@@ -10,4 +10,4 @@
   <Icon path={mdiDelete} />
 </Button>
 
-{$mods[uuid]?.metadata.name}
+{$modsOn[uuid]?.metadata.name}

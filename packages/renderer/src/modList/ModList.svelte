@@ -31,7 +31,7 @@
   }
 
   function deleteAllMods(): void {
-    for (const modId in $mods) {
+    for (const modId in $modsOn) {
       window.api.deleteMod(modId);
     }
 
