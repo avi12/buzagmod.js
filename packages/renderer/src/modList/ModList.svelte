@@ -9,7 +9,7 @@
   import { theme } from "../core/dark-mode";
   import ModCollisions from "./ModCollisions.svelte";
   import { flip } from "svelte/animate";
-  import "./ModList.svelte";
+  import "./ModList.scss";
 
   let isShowDropzone = false;
   let lastModActive = "";
