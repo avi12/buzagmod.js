@@ -26,6 +26,7 @@
   $: src = mod?.icon !== "data:" ? mod?.icon : "logo.png";
   $: if ($modsOff[uuid]) {
     isShowError = false;
+    $errorMessage = "";
   }
 
   const dispatch = createEventDispatcher();
