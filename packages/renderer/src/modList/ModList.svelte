@@ -12,7 +12,7 @@
   import "./ModList.svelte";
 
   let isShowDropzone = false;
-  let lastModInstalled = "";
+  let lastModActive = "";
 
   function onAddedMod(e): void {
     const modNew = e.detail;
@@ -77,7 +77,7 @@
   {/each}
 </article>
 
-<ModCollisions {lastModInstalled} />
+<ModCollisions {lastModActive} />
 
 <Dialog bind:active={isShowDropzone} class="pa-4">
   <Dropzone on:addedMod={onAddedMod} on:error={onError} />
