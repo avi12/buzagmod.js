@@ -3,17 +3,17 @@
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
   import MD5 from "md5";
-  import { v4 as UUID } from "uuid";
+  import { v5 as UUID } from "uuid";
   import type { Unzipped } from "fflate";
   import * as fflate from "fflate";
   import {
     errorMessage,
-    filesInUse,
     getIconDataUrl,
     getIconPath,
     modCollisions,
     pathContent,
-    regexSupportedFiles
+    regexSupportedFiles,
+    UUID_FIXED
   } from "../../../shared";
   import type { ModMetadata } from "../../../../types/global.interfaces";
   import { delay, duration } from "../core/transition-utils";
@@ -25,80 +25,6 @@
 
   function getIsFileZip(file: File): boolean {
     return file.type === "application/zip" || file.type === "application/x-zip-compressed";
-  }
-
-  async function getIsModInstallable({
-    zipEntries
-  }: {
-    zipEntries: Unzipped;
-  }): Promise<{ error?: string; isValid?: true }> {
-    const pathContent = "content/";
-
-    function hasMetadata(entries: Unzipped): Promise<Unzipped> {
-      return new Promise((resolve, reject) => {
-        const { name, author, description } = getMetadata({ zipObjRaw: entries });
-        if (name !== "" && author !== "" && description !== "") {
-          resolve(entries);
-          return;
-        }
-
-        const missingDetails = [name === "" ? "שם" : "", author === "" ? "יוצר" : "", description === "" ? "תיאור" : ""]
-          .filter(detail => detail !== "")
-          .join(", ");
-        reject(`חסרים פרטים: ${missingDetails}`);
-      });
-    }
-
-    function hasContentPath(entries: Unzipped): Promise<Unzipped> {
-      return new Promise((resolve, reject) => {
-        if (entries[pathContent]) {
-          resolve(entries);
-          return;
-        }
-
-        reject("לא ניתן לאתר את תיקיית התוכן של המוד");
-      });
-    }
-
-    function hasFiles(entries: Unzipped): Promise<Unzipped> {
-      return new Promise((resolve, reject) => {
-        const filePaths = Object.keys(entries).filter(path => !path.endsWith("/"));
-        if (filePaths.length > 0) {
-          resolve(entries);
-          return;
-        }
-
-        reject("לא נמצאו תכנים בתיקיית התוכן של המוד");
-      });
-    }
-
-    function hasNoCollisions(entries: Unzipped): Promise<Unzipped> {
-      return new Promise((resolve, reject) => {
-        const filePaths = Object.keys(entries)
-          .filter(path => !path.endsWith("/"))
-          .map(path => path.replace(pathContent, ""));
-        const collidingModIds = filePaths
-          .filter(filename => $filesInUse[filename])
-          .map(filename => $filesInUse[filename]);
-        const collisionsSet = new Set(collidingModIds);
-        $modCollisions = [...collisionsSet];
-        if ($modCollisions.length === 0) {
-          resolve(entries);
-          return;
-        }
-
-        // This message isn't being used
-        // instead, $modCollisions is used to display the mod collisions in the UI
-        reject(`התנגשות מודים`);
-      });
-    }
-
-    return hasMetadata(zipEntries)
-      .then(hasContentPath)
-      .then(hasFiles)
-      .then(hasNoCollisions)
-      .then(() => ({ isValid: true }))
-      .catch(error => ({ error }));
   }
 
   function saveModToDisk({
@@ -132,18 +58,6 @@
     return getIconDataUrl(zipEntries[getIconPath(uuid)] || new Uint8Array(0));
   }
 
-  function getMetadata({ zipObjRaw }: { zipObjRaw: Unzipped }): {
-    name?: string;
-    description?: string;
-    author?: string;
-  } {
-    const modMetadata = zipObjRaw["mod.txt"];
-    if (!modMetadata) {
-      return {};
-    }
-    return JSON.parse(new TextDecoder().decode(modMetadata));
-  }
-
   function getZipEntries({ uuid, zipObjRaw }: { uuid: string; zipObjRaw: Unzipped }): Unzipped {
     const pathIconOriginal = "icon.jpg";
     const zipEntries = { ...zipObjRaw };
@@ -169,7 +83,7 @@
 
     const zipObjRaw = fflate.unzipSync(new Uint8Array(await file.arrayBuffer()));
     const { name, description, author } = getMetadata({ zipObjRaw });
-    const uuid = UUID();
+    const uuid = UUID(name, UUID_FIXED);
     const zipEntries = getZipEntries({ zipObjRaw, uuid });
     const { error, isValid } = await getIsModInstallable({ zipEntries });
     if (!isValid) {
