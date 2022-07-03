@@ -3,8 +3,9 @@
   import { mdiDelete } from "@mdi/js";
   import { deleteMod, modCollisions } from "../../../shared";
   import ModToDelete from "./ModToDelete.svelte";
+  import "./ModCollisions.scss";
 
-  export let lastModInstalled = "";
+  export let lastModActive = "";
 
   function deleteCollidingMods(): void {
     for (const uuid of $modCollisions) {
@@ -13,13 +14,13 @@
   }
 </script>
 
-<ExpansionPanels disabled value={$modCollisions.length > 0 ? [0] : []}>
+<ExpansionPanels disabled value={$modCollisions.size > 0 ? [0] : []}>
   <ExpansionPanel>
-    {#if $modCollisions.length > 0}
+    {#if $modCollisions.size > 0}
       <article class="collisions-list-container">
-        <section class="text-body">ישנה התנגשות בין המוד "{lastModInstalled}" והמודים:</section>
+        <section class="text-body">ישנה התנגשות בין המוד "{lastModActive}" והמודים:</section>
         <section class="collisions-list">
-          {#each $modCollisions as uuid}
+          {#each [...$modCollisions] as uuid}
             <ListItem class="list-item-mod-to-delete">
               <ModToDelete {uuid} />
             </ListItem>

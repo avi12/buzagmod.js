@@ -25,8 +25,8 @@
   }
 
   function onError(e): void {
-    lastModInstalled = e.detail;
-    if ($modCollisions.length > 0) {
+    lastModActive = e.detail;
+    if ($modCollisions.size > 0) {
       isShowDropzone = false;
       $errorMessage = "";
     }
@@ -39,7 +39,7 @@
 
     $modsOn = {};
     $modsOff = {};
-    $modCollisions = [];
+    $modCollisions.clear();
     $errorMessage = "";
     $filesInUse = {};
   }
@@ -64,9 +64,9 @@
     </div>
   </AppBar>
 
-  {#each Object.entries($modsOn) as [uuid, mod], i(uuid)}
-    <div animate:flip>
-      <Mod {uuid} {mod} />
+  {#each modsAll as [uuid, mod], i (uuid)}
+    <div animate:flip={{ duration: 200 }}>
+      <Mod {uuid} {mod} on:collidingMod={({ detail: modName }) => (lastModActive = modName)} />
     </div>
   {/each}
 

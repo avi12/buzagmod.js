@@ -18,9 +18,10 @@
   import type { ModMetadata } from "../../../../types/global.interfaces";
   import { delay, duration } from "../core/transition-utils";
   import "./Dropzone.scss";
+  import { getIsModInstallable, getMetadata } from "./is-mod-installable";
 
   const dispatch = createEventDispatcher();
-  $modCollisions = [];
+  $modCollisions.clear();
 
   function getIsFileZip(file: File): boolean {
     return file.type === "application/zip" || file.type === "application/x-zip-compressed";
@@ -205,14 +206,14 @@
   <Card class="pa-5 dropzone" outlined>
     <section
       class="center-text drag-over dropzone-overlay"
-      class:drag-over--error={$errorMessage !== "" && $modCollisions.length === 0}
+      class:drag-over--error={$errorMessage !== "" && $modCollisions.size === 0}
       class:drag-over--hover={isDragOver}
       on:dragenter={() => (isDragOver = true)}
       on:dragleave={() => (isDragOver = false)}
       on:dragover|preventDefault
       on:drop|preventDefault={onDrop}
     >
-      {#if $errorMessage !== "" && $modCollisions.length === 0}
+      {#if $errorMessage !== "" && $modCollisions.size === 0}
         <div class="text-body pointer-events-none">{$errorMessage}</div>
       {:else}
         <div class="text-h5 pointer-events-none">גרור לכאן קובץ מוד</div>

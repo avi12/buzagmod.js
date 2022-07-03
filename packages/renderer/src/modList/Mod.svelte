@@ -1,22 +1,36 @@
 <script lang="ts">
   import { Avatar, Button, Checkbox, Icon, ListItem } from "svelte-materialify";
   import { mdiDelete } from "@mdi/js";
-  import { deleteMod, filesInUse, getModFilesToUuids, modCollisions, modsOff, modsOn } from "../../../shared";
-  import { v4 as UUID } from "uuid";
+  import {
+    deleteMod,
+    errorMessage,
+    filesInUse,
+    getModFilesToUuids,
+    modCollisions,
+    modsOff,
+    modsOn,
+    UUID_FIXED
+  } from "../../../shared";
+  import { createEventDispatcher } from "svelte";
+  import { getCollidingModIds } from "../dropzone/is-mod-installable";
+  import { v5 as UUID } from "uuid";
   import type { ModSingle } from "../../../../types/global.interfaces";
   import "./Mod.scss";
 
   export let mod: ModSingle;
-  export let uuid = UUID();
+  // noinspection JSUnusedAssignment
+  export let uuid = UUID(mod.metadata.name, UUID_FIXED);
 
+  let isShowError = false;
   $: isModEnabled = Boolean($modsOn[uuid]);
   $: src = mod?.icon !== "data:" ? mod?.icon : "logo.png";
+  $: if ($modsOff[uuid]) {
+    isShowError = false;
+  }
+
+  const dispatch = createEventDispatcher();
 
   function enableMod(uuid): void {
-    if (!window.api.enableMod(uuid)) {
-      return;
-    }
-
     const modDisabled = $modsOff[uuid] || ({} as ModSingle);
     $modsOn[uuid] = { ...modDisabled };
 
@@ -24,35 +38,58 @@
     $modsOff = $modsOff;
 
     $filesInUse = getModFilesToUuids();
+    dispatch("enabledMod", uuid);
+
+    window.api.enableMod(uuid);
   }
 
   function disableMod(uuid): void {
-    if (!window.api.disableMod(uuid)) {
-      return;
-    }
-
     const modEnabled = $modsOn[uuid] || ({} as ModSingle);
     $modsOff[uuid] = { ...modEnabled };
 
     delete $modsOn[uuid];
     $modsOn = $modsOn;
 
-    for (const uuidCurrent in $filesInUse) {
-      if (uuidCurrent === uuid) {
-        const file = $filesInUse[uuidCurrent];
-        const iFile = $modCollisions.indexOf(file);
-        if (iFile >= -1) {
-          $modCollisions.splice(iFile, 1);
-        }
-        delete $filesInUse[uuid];
-      }
+    for (const file in $filesInUse) {
+      $modCollisions.delete(uuid);
+      delete $filesInUse[file];
     }
+    $modCollisions = $modCollisions;
+
+    dispatch("disabledMod", uuid);
+
+    window.api.disableMod(uuid);
+  }
+
+  function enableModIfNotColliding(e: Event, uuid: string): void {
+    const collidingModIds = getCollidingModIds($modsOff[uuid].metadata.files);
+    const elCheckbox = e.target as HTMLInputElement;
+    if (collidingModIds.size === 0) {
+      enableMod(uuid);
+      elCheckbox.checked = true;
+      isShowError = false;
+      return;
+    }
+    for (const uuid of collidingModIds) {
+      $modCollisions.add(uuid);
+    }
+    $modCollisions = new Set($modCollisions);
+
+    dispatch("collidingMod", $modsOff[uuid].metadata.name);
+    elCheckbox.checked = false;
+    isShowError = true;
+
+    $errorMessage = "התנגשות";
   }
 </script>
 
 <ListItem>
   <span class="d-flex" slot="prepend">
-    <Checkbox checked={isModEnabled} on:change={e => (e.target.checked ? enableMod(uuid) : disableMod(uuid))} />
+    <Checkbox
+      checked={isModEnabled}
+      color={isShowError ? "error" : "secondary"}
+      on:change={e => (e.target.checked ? enableModIfNotColliding(e, uuid) : disableMod(uuid))}
+    />
     <Avatar size="80px">
       <img alt="" class="icon" {src} />
     </Avatar>

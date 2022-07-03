@@ -5,7 +5,7 @@ import type { Mods } from "../types/global.interfaces";
 export const modsOn = writable<Mods>({});
 export const modsOff = writable<Mods>({});
 export const errorMessage = writable("");
-export const modCollisions = writable<string[]>([]);
+export const modCollisions = writable<Set<string>>(new Set());
 export const filesInUse = writable<{ [filename: string]: string }>({});
 
 export async function getIconDataUrl(data: Uint8Array): Promise<string> {
@@ -50,10 +50,7 @@ export async function deleteMod(uuid: string): Promise<void> {
     return mods;
   });
   modCollisions.update(collisions => {
-    const iModId = collisions.indexOf(uuid);
-    if (iModId > -1) {
-      collisions.splice(iModId, 1);
-    }
+    collisions.delete(uuid);
     return collisions;
   });
 }
@@ -65,3 +62,5 @@ export const regexIcon = new RegExp(`${pathIcon}/`);
 export const regexSupportedFiles = new RegExp(
   `(?:^${pathContent}(?:${regexAudio.source}|${regexImage.source})$)|^${regexIcon.source}`
 );
+
+export const UUID_FIXED = "b38ae2e0-c30d-410b-89ab-9d087a602c14";
