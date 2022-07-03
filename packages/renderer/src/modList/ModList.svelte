@@ -33,16 +33,22 @@
   }
 
   function deleteAllMods(): void {
-    for (const modId in $modsOn) {
-      window.api.deleteMod(modId);
-    }
-
     $modsOn = {};
     $modsOff = {};
     $modCollisions.clear();
     $errorMessage = "";
     $filesInUse = {};
+
+    for (const modId in $modsOn) {
+      window.api.deleteMod(modId);
+    }
+
+    for (const modId in $modsOff) {
+      window.api.deleteMod(modId);
+    }
   }
+
+  $: modsAll = [...Object.entries($modsOn), ...Object.entries($modsOff)];
 </script>
 
 <article in:fade|local={{ delay, duration }} out:fade={{ duration }}>
@@ -67,12 +73,6 @@
   {#each modsAll as [uuid, mod], i (uuid)}
     <div animate:flip={{ duration: 200 }}>
       <Mod {uuid} {mod} on:collidingMod={({ detail: modName }) => (lastModActive = modName)} />
-    </div>
-  {/each}
-
-  {#each Object.entries($modsOff) as [uuid, mod], i(uuid)}
-    <div animate:flip>
-      <Mod {uuid} {mod} />
     </div>
   {/each}
 </article>
