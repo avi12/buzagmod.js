@@ -99,7 +99,7 @@ contextBridge.exposeInMainWorld("api", {
     if (jsonModsDisabled[uuid]) {
       deleteFiles(jsonModsDisabled);
       delete jsonModsDisabled[uuid];
-      fs.outputJsonSync(getPath(pathEnabledModsFile), jsonModsDisabled);
+      fs.outputJsonSync(getPath(pathDisabledModsFile), jsonModsDisabled);
       return true;
     }
 
