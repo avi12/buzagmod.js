@@ -2,10 +2,7 @@
   import { Card } from "svelte-materialify";
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import MD5 from "md5";
   import { v5 as UUID } from "uuid";
-  import type { Unzipped } from "fflate";
-  import * as fflate from "fflate";
   import {
     errorMessage,
     getIconDataUrl,
@@ -15,13 +12,15 @@
     regexSupportedFiles,
     UUID_FIXED
   } from "../../../shared";
-  import type { ModMetadata } from "../../../../types/global.interfaces";
   import { delay, duration } from "../core/transition-utils";
-  import "./Dropzone.scss";
   import { getIsModInstallable, getMetadata } from "./is-mod-installable";
+  import MD5 from "md5";
+  import * as fflate from "fflate";
+  import type { Unzipped } from "fflate";
+  import type { ModMetadata } from "../../../../types/global.interfaces";
+  import "./Dropzone.scss";
 
   const dispatch = createEventDispatcher();
-  $modCollisions.clear();
 
   function getIsFileZip(file: File): boolean {
     return file.type === "application/zip" || file.type === "application/x-zip-compressed";
