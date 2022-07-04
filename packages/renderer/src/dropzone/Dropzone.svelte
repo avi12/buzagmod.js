@@ -11,7 +11,7 @@
     getIconDataUrl,
     getIconPath,
     modCollisions,
-    pathContent,
+    Path,
     regexSupportedFiles,
     UUID_FIXED
   } from "../../../shared";
@@ -65,7 +65,7 @@
       zipEntries[getIconPath(uuid)] = zipObjRaw[pathIconOriginal];
     }
     for (const path in zipEntries) {
-      if (path !== pathContent && !path.match(regexSupportedFiles)) {
+      if (path !== Path.content && !path.match(regexSupportedFiles)) {
         delete zipEntries[path];
       }
     }
@@ -106,7 +106,7 @@
           author,
           md5: new MD5(file),
           files: Object.keys(zipEntries)
-            .map(path => path.replace(pathContent, ""))
+            .map(path => path.replace(Path.content, ""))
             .filter(path => path && !path.match(regexSupportedFiles))
         }
       }

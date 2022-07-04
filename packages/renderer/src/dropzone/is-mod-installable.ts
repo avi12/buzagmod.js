@@ -1,4 +1,4 @@
-import { filesInUse, modCollisions, pathContent } from "../../../shared";
+import { filesInUse, modCollisions, Path } from "../../../shared";
 import { get } from "svelte/store";
 import type { Unzipped } from "fflate";
 
@@ -31,7 +31,7 @@ function hasMetadata(entries: Unzipped): Promise<Unzipped> {
 
 function hasContentPath(entries: Unzipped): Promise<Unzipped> {
   return new Promise((resolve, reject) => {
-    if (entries[pathContent]) {
+    if (entries[Path.content]) {
       resolve(entries);
       return;
     }
@@ -61,7 +61,7 @@ function hasNoCollisions(entries: Unzipped): Promise<Unzipped> {
   return new Promise((resolve, reject) => {
     const filePaths = Object.keys(entries)
       .filter(path => !path.endsWith("/"))
-      .map(path => path.replace(pathContent, ""));
+      .map(path => path.replace(Path.content, ""));
     modCollisions.set(getCollidingModIds(filePaths));
     if (get(modCollisions).size === 0) {
       resolve(entries);
