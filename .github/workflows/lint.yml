@@ -35,6 +35,6 @@ jobs:
           run_install: true
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm i
 
-      - run: pnpm run lint
+      - run: pnpm lint
