@@ -59,9 +59,10 @@ export enum Path {
 }
 const regexAudio = /audio\/.+\.ogg/;
 const regexImage = /img\/.+\.png/;
+const regexStrings = /strings\/.+\.json/;
 const regexIcon = new RegExp(`${Path.icon}/`);
 export const regexSupportedFiles = new RegExp(
-  `(?:^${Path.content}(?:${regexAudio.source}|${regexImage.source})$)|^${regexIcon.source}`
+  `(?:^${Path.content}(?:${regexAudio.source}|${regexImage.source}|${regexStrings.source})$)|^${regexIcon.source}`
 );
 
 export const UUID_FIXED = "b38ae2e0-c30d-410b-89ab-9d087a602c14";
