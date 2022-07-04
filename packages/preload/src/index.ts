@@ -2,7 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { contextBridge } from "electron";
 import type { Unzipped } from "fflate";
-import { getIconDataUrl, Path } from "../../shared";
+import { getIconDataUrl, Paths } from "../../shared";
 import type { ModMetadata, Mods } from "../../../types/global.interfaces";
 
 enum PathModsFile {
@@ -25,7 +25,7 @@ function getModsJson(type: PathModsFile) {
 }
 
 async function getIcon({ uuid }: { uuid: string }): Promise<string> {
-  const path = getPath(`${Path.icon}/${uuid}.jpg`);
+  const path = getPath(`${Paths.icon}/${uuid}.jpg`);
   const iconData = fs.existsSync(path) ? fs.readFileSync(path) : new Buffer(0);
   return getIconDataUrl(Buffer.from(iconData));
 }
@@ -68,7 +68,7 @@ contextBridge.exposeInMainWorld("api", {
       const data = fileEntries[pathCurrent];
       const pathFull = getPath(pathCurrent);
       fs.outputFileSync(pathFull, Buffer.from(data));
-      filenames.push(pathCurrent.replace(Path.content, ""));
+      filenames.push(pathCurrent.replace(Paths.content, ""));
     }
 
     // Add as entry to data.mods
@@ -92,7 +92,7 @@ contextBridge.exposeInMainWorld("api", {
       // Delete mod files
       // @ts-ignore
       for (const file of jsonMods[uuid].files) {
-        fs.removeSync(path.join(__dirname, Path.content, file));
+        fs.removeSync(path.join(__dirname, Paths.content, file));
       }
     };
 

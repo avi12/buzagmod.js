@@ -13,7 +13,7 @@ export async function getIconDataUrl(data: Uint8Array): Promise<string> {
 }
 
 export function getIconPath(uuid: string): string {
-  return `${Path.icon}/${uuid}.jpg`;
+  return `${Paths.icon}/${uuid}.jpg`;
 }
 
 export function getModFilesToUuids(): { [filename: string]: string } {
@@ -53,16 +53,16 @@ export async function deleteMod(uuid: string): Promise<void> {
   });
 }
 
-export enum Path {
+export enum Paths {
   content = "content/",
   icon = "icons",
 }
 const regexAudio = /audio\/.+\.ogg/;
 const regexImage = /img\/.+\.png/;
 const regexStrings = /strings\/.+\.json/;
-const regexIcon = new RegExp(`${Path.icon}/`);
+const regexIcon = new RegExp(`${Paths.icon}/`);
 export const regexSupportedFiles = new RegExp(
-  `(?:^${Path.content}(?:${regexAudio.source}|${regexImage.source}|${regexStrings.source})$)|^${regexIcon.source}`
+  `(?:^${Paths.content}(?:${regexAudio.source}|${regexImage.source}|${regexStrings.source})$)|^${regexIcon.source}`
 );
 
 export const UUID_FIXED = "b38ae2e0-c30d-410b-89ab-9d087a602c14";
