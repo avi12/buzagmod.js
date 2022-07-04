@@ -22,62 +22,52 @@
   export let uuid = UUID(mod.metadata.name, UUID_FIXED);
 
   let isShowError = false;
-  $: isModEnabled = Boolean($modsOn[uuid]);
+  let isModEnabled = Boolean($modsOn[uuid]);
   $: src = mod?.icon !== "data:" ? mod?.icon : "logo.png";
-  $: if ($modsOff[uuid]) {
-    isShowError = false;
-    $errorMessage = "";
-  }
 
   const dispatch = createEventDispatcher();
 
   function enableMod(uuid): void {
     const modDisabled = $modsOff[uuid] || ({} as ModSingle);
-    $modsOn[uuid] = { ...modDisabled };
-
-    delete $modsOff[uuid];
-    $modsOff = $modsOff;
+    $modsOn = { ...$modsOn, [uuid]: modDisabled };
+    $modsOff = (({ [uuid]: _, ...modsOff }) => modsOff)($modsOff);
+    isModEnabled = true;
 
     $filesInUse = getModFilesToUuids();
-    dispatch("enabledMod", uuid);
 
     window.api.enableMod(uuid);
   }
 
   function disableMod(uuid): void {
     const modEnabled = $modsOn[uuid] || ({} as ModSingle);
-    $modsOff[uuid] = { ...modEnabled };
+    $modsOff = { ...$modsOff, [uuid]: { ...modEnabled } };
+    $modsOn = (({ [uuid]: _, ...modsOn }) => modsOn)($modsOn);
 
-    delete $modsOn[uuid];
-    $modsOn = $modsOn;
-
-    for (const file in $filesInUse) {
-      $modCollisions.delete(uuid);
-      delete $filesInUse[file];
-    }
+    $modCollisions.delete(uuid);
     $modCollisions = $modCollisions;
-
-    dispatch("disabledMod", uuid);
+    for (const file in $filesInUse) {
+      if ($filesInUse[file] === uuid) {
+        delete $filesInUse[file];
+      }
+    }
 
     window.api.disableMod(uuid);
   }
 
-  function enableModIfNotColliding(e: Event, uuid: string): void {
+  function enableModIfNotColliding(uuid: string): void {
     const collidingModIds = getCollidingModIds($modsOff[uuid].metadata.files);
-    const elCheckbox = e.target as HTMLInputElement;
     if (collidingModIds.size === 0) {
       enableMod(uuid);
-      elCheckbox.checked = true;
       isShowError = false;
       return;
     }
     for (const uuid of collidingModIds) {
       $modCollisions.add(uuid);
     }
-    $modCollisions = new Set($modCollisions);
+    $modCollisions = $modCollisions;
 
     dispatch("collidingMod", $modsOff[uuid].metadata.name);
-    elCheckbox.checked = false;
+    isModEnabled = false;
     isShowError = true;
 
     $errorMessage = "התנגשות";
@@ -87,9 +77,9 @@
 <ListItem>
   <span class="d-flex" slot="prepend">
     <Checkbox
-      checked={isModEnabled}
+      bind:checked={isModEnabled}
       color={isShowError ? "error" : "secondary"}
-      on:change={e => (e.target.checked ? enableModIfNotColliding(e, uuid) : disableMod(uuid))}
+      on:change={e => (e.target.checked ? enableModIfNotColliding(uuid) : disableMod(uuid))}
     />
     <Avatar size="80px">
       <img alt="" class="icon" {src} />
