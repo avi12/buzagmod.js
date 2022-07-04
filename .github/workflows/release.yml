@@ -93,13 +93,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.2
         with:
-          node-version: 16 # Need for pnpm >=7.4
-          cache: 'pnpm'
+          version: latest
+          run_install: true
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm i
+
+      - run: pnpm lint
 
       # The easiest way to transfer release notes to a compiled application is create `release-notes.md` in the build resources.
       # See https://github.com/electron-userland/electron-builder/issues/1511#issuecomment-310160119
