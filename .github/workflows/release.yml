@@ -128,10 +128,10 @@ jobs:
           # Code Signing params
 
           # Base64-encoded code signing certificate for Windows
-          windows_certs: ${{ secrets.windows_certs }}
+          windows_certs: ""
 
           # Password for decrypting `windows_certs`
-          windows_certs_password: ${{ secrets.windows_certs_password }}
+          windows_certs_password: ""
 
           # Base64-encoded code signing certificate for macOS
           # mac_certs: ''
