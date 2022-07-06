@@ -18,7 +18,7 @@ const config = {
   extraMetadata: {
     version: process.env.VITE_APP_VERSION,
   },
-  target: "nsis",
+  target: "portable",
 };
 
 module.exports = config;
